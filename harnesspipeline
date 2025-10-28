@@ -1,0 +1,56 @@
+pipeline:
+  name: Build .NET App Pipeline
+  identifier: build_dotnet_app_pipeline
+  projectIdentifier: harnesstest
+  orgIdentifier: default
+  stages:
+    - stage:
+        name: Build Stage
+        identifier: build_stage
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  name: Build .NET Application
+                  identifier: build_dotnet_application
+                  type: Run
+                  spec:
+                    shell: Powershell
+                    command: |-
+
+                      Write-Host "Welcome to Harness CI"
+
+                      nuget restore
+                      cd WebApplication16
+                      & "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" .\WebApplication16.csproj /p:Configuration=Release
+          platform:
+            os: Windows
+            arch: Amd64
+          runtime:
+            type: Docker
+            spec: {}
+        delegateSelectors:
+          - docker-delegate-latest
+        when:
+          pipelineStatus: All
+        variables:
+          - name: HARNESS_CI_INTERNAL_ROUTE_TO_RUNNER
+            type: String
+            description: ""
+            required: true
+            value: "true"
+  codebase:
+    connectorRef: nirangit
+    repoName: bookingapp
+    sslVerify: true
+  properties:
+    ci:
+      codebase:
+        connectorRef: nirangit
+        repoName: bookingapp
+        build: <+input>
+        skipGitClone: false
+        sslVerify: true
+  tags: {}
